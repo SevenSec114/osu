@@ -192,6 +192,11 @@ namespace osu.Game.Beatmaps
 
         public IClock Source => decoupledTrack.Source;
 
+        // TEMP: expose the interpolating clock for a live overlay.
+        public InterpolatingFramedClock InterpolatedTrack => interpolatedTrack;
+        public IClock InterpolatedSource => interpolatedTrack.Source;
+        // TEMP end.
+
         public void Reset()
         {
             decoupledTrack.Reset();

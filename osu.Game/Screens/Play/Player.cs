@@ -340,6 +340,10 @@ namespace osu.Game.Screens.Play
                 },
             });
 
+            // TEMP: clocks graph overlay in gameplay
+            GameplayClockContainer.Add(new ClockGraphOverlay { GameplayClock = GameplayClockContainer, Depth = float.MinValue });
+            // TEMP end.
+
             if (Configuration.AllowRestart)
             {
                 GameplayClockContainer.Add(retryOverlay = new HotkeyRetryOverlay

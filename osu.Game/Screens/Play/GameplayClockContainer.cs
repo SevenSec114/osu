@@ -51,6 +51,10 @@ namespace osu.Game.Screens.Play
         /// </summary>
         protected readonly FramedBeatmapClock GameplayClock;
 
+        // TEMP: expose the beatmap clock for a live overlay.
+        public FramedBeatmapClock BeatmapClock => GameplayClock;
+        // TEMP end.
+
         protected override Container<Drawable> Content { get; } = new Container { RelativeSizeAxes = Axes.Both };
 
         /// <summary>
