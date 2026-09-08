@@ -57,6 +57,10 @@ namespace osu.Game.Screens.Play
         private readonly IBeatmap beatmap;
 
         private Track track;
+        private BufferClock? buffer;
+
+        [Resolved]
+        private AudioManager audioManager { get; set; } = null!;
 
         [Resolved]
         private MusicController musicController { get; set; } = null!;
@@ -109,6 +113,11 @@ namespace osu.Game.Screens.Play
         protected override void StartGameplayClock()
         {
             addAdjustmentsToTrack();
+
+            // Seek to the current time to avoid the flushed track position causing a jump on resume.
+            if (!track.IsRunning && Math.Abs(track.CurrentTime - GameplayClock.CurrentTime) > 1)
+                GameplayClock.Seek(GameplayClock.CurrentTime);
+
             base.StartGameplayClock();
         }
 
@@ -209,6 +218,9 @@ namespace osu.Game.Screens.Play
             track.BindAdjustments(AdjustmentsFromMods);
             track.AddAdjustment(AdjustableProperty.Frequency, UserPlaybackRate);
 
+            buffer?.BufferTrack.BindAdjustments(AdjustmentsFromMods);
+            buffer?.BufferTrack.AddAdjustment(AdjustableProperty.Frequency, UserPlaybackRate);
+
             speedAdjustmentsApplied = true;
         }
 
@@ -220,7 +232,22 @@ namespace osu.Game.Screens.Play
             track.UnbindAdjustments(AdjustmentsFromMods);
             track.RemoveAdjustment(AdjustableProperty.Frequency, UserPlaybackRate);
 
+            buffer?.BufferTrack.UnbindAdjustments(AdjustmentsFromMods);
+            buffer?.BufferTrack.RemoveAdjustment(AdjustableProperty.Frequency, UserPlaybackRate);
+
             speedAdjustmentsApplied = false;
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            if (StartTime < 0 && buffer == null)
+            {
+                var silent = audioManager.Tracks.GetSilent(Math.Abs(StartTime));
+                buffer = new BufferClock(track, silent, StartTime);
+                ChangeSource(buffer);
+            }
         }
 
         protected override void Dispose(bool isDisposing)

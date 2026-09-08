@@ -468,6 +468,8 @@ namespace osu.Game.Tests.Visual
                     AddItem(track);
                     return track;
                 }
+
+                public Track GetSilent(double length, string name = "silent") => throw new NotImplementedException();
             }
 
             /// <summary>
